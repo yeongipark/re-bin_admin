@@ -40,7 +40,9 @@ export default function Nav() {
   return (
     <>
       <nav className={styles.nav}>
-        <h1 className={styles.title}>Re:bin admin</h1>
+        <Link href={"/"}>
+          <p className={styles.title}>Re:bin admin</p>
+        </Link>
         <HiMenu className={styles.hamburger} onClick={toggleMenu} />
       </nav>
 

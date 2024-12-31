@@ -11,7 +11,6 @@ export default function RootLayout({
         style={{
           maxWidth: "600px",
           margin: "auto",
-          padding: "1rem",
           minHeight: "100vh",
         }}
       >

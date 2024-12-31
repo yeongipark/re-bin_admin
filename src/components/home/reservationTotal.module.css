@@ -1,0 +1,23 @@
+.container {
+  border: 1px solid var(--gray6);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 1rem 0;
+  border-radius: 10px;
+  margin-top: 3rem;
+  font-size: 1.2rem;
+}
+
+.container p:nth-child(2) {
+  font-weight: bold;
+}
+
+.count {
+  text-decoration: underline;
+  padding: 0.6rem;
+}
+
+.container Link {
+  cursor: pointer;
+}
