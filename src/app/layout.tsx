@@ -1,4 +1,3 @@
-import Nav from "@/components/nav/nav";
 import "./globals.css";
 
 export default function RootLayout({
@@ -16,7 +15,6 @@ export default function RootLayout({
           minHeight: "100vh",
         }}
       >
-        <Nav />
         {children}
       </body>
     </html>
