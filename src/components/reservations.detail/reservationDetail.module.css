@@ -1,0 +1,30 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table th {
+  all: unset;
+  text-align: left;
+  padding: 8px;
+  width: 30%;
+  vertical-align: top;
+  font-size: 0.9rem;
+  font-weight: 0;
+}
+
+.table td {
+  vertical-align: top;
+  font-size: 0.9rem;
+  padding-bottom: 1rem;
+}
+
+.request {
+  white-space: pre-line; /* 줄바꿈 유지 */
+}
