@@ -1,4 +1,4 @@
-import EditForm from "@/components/notice.write/writeForm";
+import EditForm from "@/components/notice.edit/editForm";
 
 export default function Page() {
   return (

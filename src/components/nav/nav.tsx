@@ -54,7 +54,7 @@ export default function Nav() {
           {[
             { name: "예약 현황", link: "/reservations" },
             { name: "상품 관리", link: "/products" },
-            { name: "공지 관리", link: "/notices" },
+            { name: "공지 관리", link: "/notice" },
             { name: "시간 관리", link: "/time-management" },
             { name: "소개 관리", link: "/introduction" },
             { name: "프로필 관리", link: "/profile" },

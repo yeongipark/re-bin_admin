@@ -1,0 +1,67 @@
+.container {
+  background-color: white;
+  border-radius: 10px;
+  width: 100%;
+  margin: auto;
+  max-width: 600px;
+}
+
+.title {
+  padding: 1rem;
+  padding-bottom: 0;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+
+.date {
+  padding: 1rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 0.9rem;
+  color: gray;
+  margin-bottom: 10px;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  margin: 15px 0;
+}
+
+.content {
+  padding: 1rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  height: 25rem;
+  overflow-y: scroll;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 20px;
+}
+
+.editButton,
+.deleteButton {
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 20px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.editButton:hover {
+  background-color: #e0e0e0;
+}
+
+.deleteButton:hover {
+  background-color: #e0e0e0;
+}
+
+.editButton:active,
+.deleteButton:active {
+  transform: scale(0.98);
+}

@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import styles from "./notice.module.css";
 
 type Notice = {
@@ -21,6 +24,12 @@ const mockData: Notice[] = [
 ];
 
 export default function Notice() {
+  const router = useRouter();
+
+  const movePage = (id: number | string) => {
+    router.push(`/notice/detail/${id}`);
+  };
+
   return (
     <div>
       <table className={styles.table}>
@@ -33,7 +42,12 @@ export default function Notice() {
         </thead>
         <tbody>
           {mockData.map((item) => (
-            <tr key={item.id}>
+            <tr
+              key={item.id}
+              onClick={() => {
+                movePage(item.id);
+              }}
+            >
               <td className={styles.id}>{item.id}</td>
               <td>{item.title}</td>
               <td>{item.date}</td>
