@@ -10,7 +10,6 @@ type Reservation = {
   product: string;
   reserver: string;
   time: string;
-  applicationDate: string;
   status: string;
   check: boolean;
 };
@@ -21,7 +20,6 @@ const mockData: Reservation[] = [
     product: "개인 프로필",
     reserver: "오주은",
     time: "2024-10-01 13:00",
-    applicationDate: "2024-09-01 13:31",
     status: "입금 완료",
     check: false,
   },
@@ -30,7 +28,6 @@ const mockData: Reservation[] = [
     product: "개인 프로필",
     reserver: "오주은",
     time: "2024-10-01 13:00",
-    applicationDate: "2024-09-01 13:31",
     status: "입금 확인 요청",
     check: true,
   },
@@ -137,7 +134,6 @@ export default function Reservations() {
             <th>상품명</th>
             <th>예약자</th>
             <th>예약 시각</th>
-            <th>신청 일시</th>
             <th>상태</th>
             <th></th>
           </tr>
@@ -149,7 +145,6 @@ export default function Reservations() {
               <td>{item.product}</td>
               <td>{item.reserver}</td>
               <td>{item.time}</td>
-              <td>{item.applicationDate}</td>
               <td>
                 <span>{item.status}</span>
               </td>

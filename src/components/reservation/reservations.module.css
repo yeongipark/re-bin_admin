@@ -58,7 +58,7 @@
 .table th,
 .table td {
   background-color: var(--gray);
-  font-size: 0.5rem;
+  font-size: 0.7rem;
   text-align: center;
   padding: 0.5rem 0.2rem;
 }
@@ -78,7 +78,7 @@
 }
 
 .btn {
-  font-size: 0.5rem;
+  font-size: 0.7rem;
   background-color: #d9d9d9;
 }
 
