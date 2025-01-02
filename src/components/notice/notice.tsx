@@ -2,32 +2,45 @@
 
 import { useRouter } from "next/navigation";
 import styles from "./notice.module.css";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import apiClient from "@/util/axios";
 
 type Notice = {
   id: number | string;
   title: string;
-  date: string;
+  content: string;
+  createdAt: string;
 };
 
-const mockData: Notice[] = [
-  {
-    id: 1,
-    title:
-      "공지사항1dflkajsdkfjsdlfkjsdfjskfjslfjsjfkldjflskjfkdsjalfkdsjfklasjdflkajsdfklasjkldffkdsjlfsd",
-    date: "2024.04.03",
-  },
-  {
-    id: 2,
-    title: "공지사항2",
-    date: "2024.04.04",
-  },
-];
+type FetchNoticesResponse = {
+  notices: Notice[];
+  nextPage: number | null;
+};
+
+async function fetchPosts(page: number): Promise<FetchNoticesResponse> {
+  const { data } = await apiClient.get(`/api/notices?page=0`);
+  return {
+    notices: data.notices,
+    nextPage: data.hasNextPage ? page + 1 : null,
+  };
+}
 
 export default function Notice() {
   const router = useRouter();
 
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["notices"],
+      getNextPageParam: (lastPage) => lastPage.nextPage,
+      queryFn: ({ pageParam = 0 }) => fetchPosts(pageParam),
+    });
+
   const movePage = (id: number | string) => {
     router.push(`/notice/detail/${id}`);
+  };
+
+  const formatDate = (dateString: string) => {
+    return dateString.split("T")[0]; // '2024-12-31T00:00:00' -> '2024-12-31'
   };
 
   return (
@@ -41,20 +54,36 @@ export default function Notice() {
           </tr>
         </thead>
         <tbody>
-          {mockData.map((item) => (
-            <tr
-              key={item.id}
-              onClick={() => {
-                movePage(item.id);
-              }}
-            >
-              <td className={styles.id}>{item.id}</td>
-              <td>{item.title}</td>
-              <td>{item.date}</td>
-            </tr>
-          ))}
+          {data?.pages.map((page) =>
+            page.notices.map((item) => (
+              <tr
+                key={item.id}
+                onClick={() => {
+                  movePage(item.id);
+                }}
+              >
+                <td className={styles.id}>{item.id}</td>
+                <td>{item.title}</td>
+                <td>{formatDate(item.createdAt)}</td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
+
+      {/* 더보기 버튼 */}
+      {hasNextPage && (
+        <button
+          onClick={() => fetchNextPage()}
+          disabled={isFetchingNextPage}
+          className={styles.loadMoreButton}
+        >
+          {isFetchingNextPage ? "로딩 중..." : "더보기"}
+        </button>
+      )}
+
+      {/* 로딩 표시 */}
+      {isFetching && !isFetchingNextPage && <p>로딩 중...</p>}
     </div>
   );
 }

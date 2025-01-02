@@ -1,0 +1,74 @@
+@keyframes slideIn {
+  from {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+}
+
+.alert {
+  max-width: 500px;
+  min-width: 300px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: none;
+  border-radius: 10px;
+  margin: 0;
+  text-align: center;
+  animation: slideIn 0.3s forwards; /* 초기 애니메이션 */
+}
+
+.alert.hidden {
+  animation: slideOut 0.3s forwards; /* 닫힐 때 애니메이션 */
+}
+
+.icon {
+  font-size: 2.5rem;
+}
+
+.alert > p {
+  margin-top: 0.7rem;
+}
+
+.title {
+  font-size: 1.3rem;
+}
+
+.subTitle {
+  font-size: 0.9rem;
+}
+
+.btn {
+  border-radius: 30px;
+  margin-top: 1rem;
+  padding: 0.5rem 2rem;
+  background-color: var(--main);
+  color: white;
+  outline: none;
+}
+
+.btn:hover {
+  background-color: var(--hoverMain);
+  outline: none;
+}
+
+.btn:active {
+  background-color: var(--activeMain);
+  outline: none;
+}

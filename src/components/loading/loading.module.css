@@ -1,0 +1,20 @@
+.container {
+  text-align: center;
+}
+
+.icon {
+  font-size: 2rem; /* 아이콘 크기 */
+  animation: spin 1s linear infinite; /* 애니메이션 적용 */
+  margin-bottom: 0.6rem;
+  margin-top: 10rem;
+}
+
+/* 회전 애니메이션 정의 */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

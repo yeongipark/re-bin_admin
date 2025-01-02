@@ -1,67 +1,131 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./noticeDetail.module.css";
+import apiClient from "@/util/axios";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Loading from "../loading/loading";
+import Alert from "../alert/alert";
+import Confirm from "../confirm";
 
 type Notice = {
-  id: string;
+  id: number;
   title: string;
-  date: string;
   content: string;
+  createdAt: string;
 };
 
-const mockData: Notice = {
-  id: "1",
-  title: "예약 전 필독!",
-  date: "2024.10.25",
-  content: `
-    📢 예약 전 필독!
-    촬영 문의는 계정 팔로우 후 카카오톡으로 예약 양식에 맞춰서 보내주세요.
-    촬영은 대구에서 이루어집니다.
-    주말은 저녁 6시반 이후로 촬영 가능하며 평일은 요일에 따라 가능한 시간을 알려드립니다.
-
-    예약 양식 성함 촬영 인원 희망 날짜 및 시간(1,2지망)
-    스튜디오 or 야외 스냅
-    원하시는 시안/컨셉 촬영 안내 사항 확인
-
-    감사합니다 :)
-  `,
-};
-
-export default function NoticeDetail() {
+export default function NoticeDetail({ id }: { id: number | string }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const { data, isLoading, isError } = useQuery<Notice>({
+    queryKey: ["notice_detail", id],
+    queryFn: () => getData(id),
+    refetchOnMount: false,
+  });
+
+  const { mutate: deleteNotice, isLoading: isDeleting } = useMutation({
+    mutationFn: () => deleteData(id),
+    onMutate: async () => {
+      const previousData = queryClient.getQueryData(["notices"]);
+
+      queryClient.setQueryData(["notices"], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            notices: page.notices.filter((notice: Notice) => notice.id !== id),
+          })),
+        };
+      });
+
+      return { previousData };
+    },
+    onError: (error, variables, context) => {
+      queryClient.setQueryData(["notices"], context?.previousData);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["notices"],
+        refetchType: "all",
+      });
+      router.back();
+    },
+  });
 
   const handleEdit = () => {
     const query = new URLSearchParams({
-      title: mockData.title,
-      content: mockData.content,
+      title: data?.title || "",
+      content: data?.content || "",
+      id: data?.id || "",
     }).toString();
 
     router.push(`/notice/edit?${query}`);
   };
 
   const handleDelete = () => {
-    alert("삭제하기 버튼 클릭!");
+    setShowConfirm(true);
   };
+
+  const confirmDelete = () => {
+    deleteNotice();
+    setShowConfirm(false); // Confirm 모달 닫기
+  };
+
+  if (isError) {
+    return (
+      <Alert
+        title="오류가 발생했습니다. 다시 시도해 주세요."
+        type="cancel"
+        setModalState={() => {
+          router.back();
+        }}
+      />
+    );
+  }
 
   return (
     <div className={styles.container}>
-      <p className={styles.title}>📢 {mockData.title}</p>
-      <p className={styles.date}>{mockData.date}</p>
+      {isLoading || isDeleting ? <Loading text="로딩중.." /> : null}
+      {showConfirm && (
+        <Confirm
+          title="삭제하시겠습니까?"
+          setModalState={setShowConfirm}
+          ok="삭제"
+          cancel="취소"
+          func={confirmDelete}
+        />
+      )}
+      <p className={styles.title}>{data?.title}</p>
+      <p className={styles.date}>{data?.createdAt.split("T")[0]}</p>
       <hr className={styles.divider} />
-      <div className={styles.content}>
-        {mockData.content.split("\n").map((line, idx) => (
-          <p key={idx}>{line}</p>
-        ))}
-      </div>
+      <div className={styles.content}>{data?.content}</div>
       <div className={styles.buttonGroup}>
         <button className={styles.editButton} onClick={handleEdit}>
           수정하기
         </button>
-        <button className={styles.deleteButton} onClick={handleDelete}>
+        <button
+          className={styles.deleteButton}
+          onClick={handleDelete}
+          disabled={isDeleting}
+        >
           삭제하기
         </button>
       </div>
     </div>
   );
+}
+
+async function getData(id: string | number) {
+  const { data } = await apiClient.get(`/api/notices/${id}`);
+  return data;
+}
+
+async function deleteData(id: string | number) {
+  await apiClient.delete(`/admin/notices/${id}`);
 }

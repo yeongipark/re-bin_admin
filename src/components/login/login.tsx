@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import style from "./login.module.css";
 import Image from "next/image";
 import apiClient from "@/util/axios";
 import { useRouter } from "next/navigation";
-import { setToken } from "@/util/cookie";
+import { getToken, setToken } from "@/util/cookie";
 
 export default function Login() {
   const [idFocused, setIdFocused] = useState(false);
@@ -18,7 +18,7 @@ export default function Login() {
 
   const login = async () => {
     try {
-      const res = await apiClient.post(`/admin/login/`, {
+      const res = await apiClient.post(`admin/login`, {
         loginId,
         password,
       });
@@ -45,6 +45,13 @@ export default function Login() {
   };
 
   const isButtonDisabled = loginId.length < 4 || password.length < 4;
+
+  useEffect(() => {
+    const token = getToken();
+    if (token) {
+      router.replace("/");
+    }
+  }, []);
 
   return (
     <div className={style.wrap}>

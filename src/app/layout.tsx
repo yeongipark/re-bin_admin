@@ -1,3 +1,4 @@
+import ReactQueryProvider from "@/util/reactQueryProvider";
 import "./globals.css";
 
 export default function RootLayout({
@@ -14,7 +15,7 @@ export default function RootLayout({
           minHeight: "100vh",
         }}
       >
-        {children}
+        <ReactQueryProvider>{children}</ReactQueryProvider>
       </body>
     </html>
   );

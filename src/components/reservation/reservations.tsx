@@ -4,45 +4,34 @@ import { useState, useEffect } from "react";
 import styles from "./reservations.module.css";
 import { IoIosSearch } from "react-icons/io";
 import Confirm from "@/components/confirm"; // Confirm 컴포넌트를 import합니다.
+import { ReservationStatusType } from "../types";
+import apiClient from "@/util/axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 type Reservation = {
-  id: string;
-  product: string;
-  reserver: string;
+  id: number | string;
+  code: string;
+  productName: string;
+  name: string;
   time: string;
-  status: string;
-  check: boolean;
+  reserveTime: string;
+  status: keyof typeof ReservationStatusType;
 };
 
-const mockData: Reservation[] = [
-  {
-    id: "REBIN20240925A",
-    product: "개인 프로필",
-    reserver: "오주은",
-    time: "2024-10-01 13:00",
-    status: "입금 완료",
-    check: false,
-  },
-  {
-    id: "REBIN20240925B",
-    product: "개인 프로필",
-    reserver: "오주은",
-    time: "2024-10-01 13:00",
-    status: "입금 확인 요청",
-    check: true,
-  },
-];
-
 export default function Reservations() {
+  const router = useRouter();
+
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [searchId, setSearchId] = useState("");
   const [searchReserver, setSearchReserver] = useState("");
-  const [filteredData, setFilteredData] = useState<Reservation[]>(mockData);
 
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false); // Confirm 컴포넌트의 상태
   const [selectedReservation, setSelectedReservation] =
     useState<Reservation | null>(null); // 선택된 예약 정보를 저장
+
+  const queryClient = useQueryClient();
 
   // 초기 날짜 설정
   useEffect(() => {
@@ -56,19 +45,60 @@ export default function Reservations() {
 
     setEndDate(formattedEndDate);
     setStartDate(firstDayOfMonth);
-    handleSearch();
   }, []);
 
-  const handleSearch = () => {
-    const filtered = mockData.filter(
-      (item) =>
-        (searchId === "" || item.id.includes(searchId)) &&
-        (searchReserver === "" || item.reserver.includes(searchReserver)) &&
-        item.time >= startDate &&
-        item.time <= endDate
-    );
-    setFilteredData(filtered);
-  };
+  const { data, isLoading } = useQuery<Reservation[]>({
+    queryKey: ["reservations", startDate, endDate],
+    queryFn: () => getData(startDate, endDate),
+    enabled: !!startDate && !!endDate,
+  });
+
+  const { mutate } = useMutation({
+    mutationFn: checkPayment,
+    onMutate: async (reservationId: number | string) => {
+      // 이전 캐시 데이터를 저장
+      const previousData = queryClient.getQueryData<Reservation[]>([
+        "reservations",
+        startDate,
+        endDate,
+      ]);
+
+      // 낙관적 업데이트
+      queryClient.setQueryData<Reservation[]>(
+        ["reservations", startDate, endDate],
+        (oldData) =>
+          oldData?.map((reservation) =>
+            reservation.id === reservationId
+              ? { ...reservation, status: "PAYMENT_CONFIRMED" }
+              : reservation
+          ) ?? []
+      );
+
+      return { previousData };
+    },
+    onError: (error, variables, context) => {
+      // 에러 발생 시 이전 데이터를 복구
+      queryClient.setQueryData(
+        ["reservations", startDate, endDate],
+        context?.previousData
+      );
+    },
+    onSettled: () => {
+      // 쿼리 재검증
+      queryClient.invalidateQueries({
+        queryKey: ["reservations", startDate, endDate],
+        refetchType: "all",
+      });
+    },
+  });
+
+  const filteredData = data
+    ? data.filter(
+        (item) =>
+          (searchId === "" || item.code.includes(searchId)) &&
+          (searchReserver === "" || item.name.includes(searchReserver))
+      )
+    : [];
 
   const handleStartDateChange = (value: string) => {
     if (value > endDate) {
@@ -124,59 +154,84 @@ export default function Reservations() {
           value={searchReserver}
           onChange={(e) => setSearchReserver(e.target.value)}
         />
-        <IoIosSearch className={styles.searchButton} onClick={handleSearch} />
+        <IoIosSearch className={styles.searchButton} onClick={() => {}} />
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>예약번호</th>
-            <th>상품명</th>
-            <th>예약자</th>
-            <th>예약 시각</th>
-            <th>상태</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData.map((item) => (
-            <tr key={item.id}>
-              <td className={styles.id}>{item.id}</td>
-              <td>{item.product}</td>
-              <td>{item.reserver}</td>
-              <td>{item.time}</td>
-              <td>
-                <span>{item.status}</span>
-              </td>
-              <td>
-                {item.check && (
-                  <button
-                    className={styles.btn}
-                    onClick={() => handleCompleteClick(item)}
-                  >
-                    완료
-                  </button>
-                )}
-              </td>
+      {isLoading ? (
+        <p>로딩 중...</p>
+      ) : (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>예약번호</th>
+              <th>상품명</th>
+              <th>예약자</th>
+              <th>예약 시각</th>
+              <th>상태</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredData.map((item) => (
+              <tr key={item.id}>
+                <td
+                  onClick={() => {
+                    router.push(`/detail?code=${item.code}`); // `/detail`로 이동하면서 `code` 전달
+                  }}
+                  className={styles.id}
+                >
+                  {item.code}
+                </td>
+                <td>{item.productName}</td>
+                <td>{item.name}</td>
+                <td>{item.reserveTime}</td>
+                <td>
+                  <span>{ReservationStatusType[item.status]}</span>
+                </td>
+                <td>
+                  {item.status === "CONFIRM_REQUESTED" && ( // 상태가 PENDING일 때만 버튼 활성화
+                    <button
+                      className={styles.btn}
+                      onClick={() => handleCompleteClick(item)}
+                    >
+                      완료
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       {/* Confirm 컴포넌트 */}
       {confirmOpen && selectedReservation && (
         <Confirm
           title="완료 처리하시겠습니까?"
-          subTitle={`예약번호: ${selectedReservation.id}`}
+          subTitle={`예약번호: ${selectedReservation.code}`}
           setModalState={setConfirmOpen}
           ok="확인"
           cancel="취소"
           func={() => {
-            console.log(`${selectedReservation.id} 완료 처리`);
+            mutate(selectedReservation.id); // 선택된 예약 ID로 mutate 실행
             setConfirmOpen(false);
           }}
         />
       )}
     </div>
   );
+}
+
+async function getData(
+  startDate: string,
+  endDate: string
+): Promise<Reservation[]> {
+  const res = await apiClient.get(
+    `/admin/reservations?startDate=${startDate}&endDate=${endDate}`
+  );
+  return res.data;
+}
+
+async function checkPayment(reservationId: number | string) {
+  await apiClient.patch(`/admin/reservations/deposit/${reservationId}`);
 }
