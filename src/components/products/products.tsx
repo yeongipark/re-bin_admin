@@ -2,7 +2,7 @@
 
 import apiClient from "@/util/axios";
 import styles from "./products.module.css";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Loading from "../loading/loading";
 import { useRouter } from "next/navigation";
 
@@ -15,13 +15,43 @@ interface Product {
 
 export default function Products() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: fetchPosts,
   });
 
+  const { mutate } = useMutation({
+    mutationFn: deleteProduct,
+    onMutate: async (productId: number | string) => {
+      await queryClient.cancelQueries({ queryKey: ["products"] });
+
+      const previousData = queryClient.getQueryData<Product[]>(["products"]);
+
+      queryClient.setQueryData<Product[]>(
+        ["products"],
+        (prev) => prev?.filter((product) => product.id !== productId) ?? []
+      );
+
+      return { previousData };
+    },
+    onError: () => {
+      alert("상품 삭제에 실패했습니다.");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+
   if (isLoading) return <Loading text="로딩중.." />;
+
+  const handleDelete = (productId: number | string) => {
+    const confirmed = window.confirm("정말로 삭제하시겠습니까?");
+    if (confirmed) {
+      mutate(productId);
+    }
+  };
 
   return (
     <div>
@@ -58,7 +88,7 @@ export default function Products() {
                 <button>수정하기</button>
               </td>
               <td>
-                <button>삭제하기</button>
+                <button onClick={() => handleDelete(post.id)}>삭제하기</button>
               </td>
             </tr>
           ))}
@@ -71,4 +101,8 @@ export default function Products() {
 async function fetchPosts(): Promise<Product[]> {
   const { data } = await apiClient.get(`/admin/products`);
   return data;
+}
+
+async function deleteProduct(productId: number | string) {
+  await apiClient.delete(`/admin/products/${productId}`);
 }
