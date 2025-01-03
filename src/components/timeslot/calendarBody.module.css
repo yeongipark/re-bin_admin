@@ -1,0 +1,81 @@
+.container {
+  width: 100%;
+  height: auto;
+}
+
+.dayWrap {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(30px, 1fr));
+  grid-row-gap: 15px;
+  font-size: 1rem;
+}
+
+/* 요일 컴포넌트 */
+.week {
+  text-align: center;
+}
+
+/* 주말 스타일 */
+.weekend {
+  color: red;
+}
+
+/* 날짜 컴포넌트 */
+.day {
+  text-align: center;
+  height: 2rem;
+  cursor: pointer;
+  border-radius: 15px;
+  display: flex;
+  /* justify-content: center; */
+  flex-direction: column;
+}
+
+.day:active {
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+/* 오늘보다 이전 날짜는 선택할 수 없도록 */
+.disabled {
+  opacity: 0.3;
+  pointer-events: none !important;
+}
+
+/* 현재 달과 다른 날짜는 안보이게 설정 */
+.container .none {
+  opacity: 0 !important;
+}
+
+/* 점 wrap */
+.todayWrap {
+  display: flex;
+  justify-content: center;
+}
+
+/* 오늘 날짜에 점 표시하기 */
+.today {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--main);
+}
+
+/* 선택된 날짜 스타일 */
+.selected {
+  background-color: rgb(240, 240, 240);
+}
+
+/* 달력 내비게이션 스타일 */
+.navContainer {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  color: var(--main);
+  margin: 10px 0px 20px 0px;
+}
+
+/* 달력 내비게이션 버튼 스타일 */
+.button {
+  cursor: pointer;
+}
