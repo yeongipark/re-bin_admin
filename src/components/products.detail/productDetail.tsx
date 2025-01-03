@@ -40,7 +40,7 @@ export default function ProductDetail({ id }: { id: number | string }) {
       <div className={styles.thumbnail}>
         <div className={styles.thumbnailImage}>
           <Image
-            src={data!.thumbnail}
+            src={`https://image.re-bin.kr/rebin/${data!.thumbnail}`}
             alt="Thumbnail"
             width={100}
             height={100}
@@ -105,7 +105,7 @@ export default function ProductDetail({ id }: { id: number | string }) {
                 width={100}
                 height={100}
                 layout="responsive"
-                src={image.url}
+                src={`https://image.re-bin.kr/rebin/${image.url}`}
                 alt={`Gallery ${index}`}
               />
             </div>

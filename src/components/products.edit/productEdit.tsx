@@ -5,8 +5,9 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { TiDeleteOutline } from "react-icons/ti";
 import Loading from "../loading/loading";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import apiClient from "@/util/axios";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: number;
@@ -27,6 +28,9 @@ interface Image {
 }
 
 export default function ProductEdit({ id }: { id: number | string }) {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
   const [product, setProduct] = useState({
     name: "", // 상품명
     price: "", // 가격
@@ -44,6 +48,10 @@ export default function ProductEdit({ id }: { id: number | string }) {
     description: 0,
   });
 
+  const [serverThumbnail, setServerThumbnail] = useState(null);
+  const [serverimages, setServerImages] = useState([]);
+  const [isSaveDisabled, setIsSaveDisabled] = useState(true); // 저장 버튼 상태 관리
+
   const { data, isLoading } = useQuery({
     queryKey: ["product_detail", id],
     queryFn: () => getData(id),
@@ -56,19 +64,63 @@ export default function ProductEdit({ id }: { id: number | string }) {
         price: data.price.toString(),
         summary: data.summary,
         description: data.description,
-        thumbnail: data.thumbnail,
-        images: data.images.map((img) => img.url),
+        thumbnail: { url: data.thumbnail, type: "server" },
+        images: data.images.map((img) => ({ url: img.url, type: "server" })),
         deposit: data.deposit.toString(),
         additionalFee: data.additionalFee.toString(),
         guideLine: data.guideLine,
       });
 
       setContentLength({
-        guideLine: data.guideLine.length,
-        description: data.description.length,
+        guideLine: data.guideLine?.length || 0,
+        description: data.description?.length || 0,
       });
     }
   }, [data]);
+
+  const { mutate } = useMutation({
+    mutationFn: ({ id, data }: { id: number | string; data: any }) =>
+      editProduct(id, data), // 객체 구조 분해
+    onMutate: () => {
+      queryClient.cancelQueries({ queryKey: ["product_detail", id] });
+
+      queryClient.setQueryData(["product_detail", id], () => ({
+        ...product,
+        thumbnail: serverThumbnail || product.thumbnail,
+        images: serverimages.length > 0 ? serverimages : product.images,
+      }));
+    },
+    onSuccess: () => {
+      alert("수정을 완료했습니다.");
+      router.replace(`/products/detail/${id}`);
+    },
+    onError: () => {
+      alert("수정에 실패했습니다.");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["product_detail", id] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+
+  // 저장 버튼 활성화 조건 업데이트
+  useEffect(() => {
+    const isAllFieldsFilled =
+      product.name.trim() && // 상품명
+      product.price &&
+      !isNaN(Number(product.price)) && // 가격
+      product.summary.trim() && // 한줄 소개
+      product.description.trim() && // 상품 설명
+      product.deposit &&
+      !isNaN(Number(product.deposit)) && // 예약금
+      product.additionalFee &&
+      !isNaN(Number(product.additionalFee)) && // 추가 금액
+      product.guideLine.trim() && // 가이드라인
+      (serverThumbnail || product.thumbnail) &&
+      (serverimages.length !== 0 || product.images.length !== 0);
+
+    setIsSaveDisabled(!isAllFieldsFilled);
+  }, [product, serverThumbnail, serverimages]);
 
   if (isLoading) return <Loading text="로딩중.." />;
 
@@ -92,20 +144,56 @@ export default function ProductEdit({ id }: { id: number | string }) {
     if (e.target.files && e.target.files[0]) {
       setProduct((prev) => ({
         ...prev,
-        thumbnail: URL.createObjectURL(e.target.files[0]),
+        thumbnail: {
+          url: e.target.files[0], // 로컬 이미지 URL
+          type: "local", // 로컬 썸네일
+        },
       }));
     }
   };
 
   const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const filesArray = Array.from(e.target.files).map((file) =>
-        URL.createObjectURL(file)
-      );
+      const filesArray = Array.from(e.target.files).map((file) => ({
+        url: file,
+        type: "local", // 사용자가 업로드한 이미지는 "local" 타입
+      }));
       setProduct((prev) => ({
         ...prev,
-        images: [...filesArray, ...prev.images], // 새 이미지를 왼쪽에 추가
+        images: [...prev.images, ...filesArray], // File 객체 배열 추가
       }));
+    }
+  };
+
+  const handleSaveThumbnail = async () => {
+    try {
+      if (product.thumbnail) {
+        const thumbnailResponse = await postImage([product.thumbnail]);
+        setServerThumbnail(thumbnailResponse.local.urls[0]);
+        alert("썸네일 저장 완료!");
+      } else {
+        alert("썸네일 이미지를 업로드하세요.");
+      }
+    } catch (error) {
+      console.error("썸네일 저장 실패:", error);
+      alert("썸네일 저장에 실패했습니다.");
+    }
+  };
+
+  const handleSaveGallery = async () => {
+    try {
+      if (product.images.length > 0) {
+        const { local, server } = await postImage(product.images);
+        console.log(local, server);
+        setServerImages([...local?.urls, ...server?.map((data) => data.url)]);
+
+        alert("갤러리 이미지 저장 완료!");
+      } else {
+        alert("갤러리 이미지를 업로드하세요.");
+      }
+    } catch (error) {
+      console.error("갤러리 이미지 저장 실패:", error);
+      alert("갤러리 이미지 저장에 실패했습니다.");
     }
   };
 
@@ -116,6 +204,28 @@ export default function ProductEdit({ id }: { id: number | string }) {
     }));
   };
 
+  const handleSaveBtn = () => {
+    const confirmed = window.confirm("정말로 수정하시겠습니까?");
+    if (confirmed) {
+      const updateData = {
+        name: product.name.trim(),
+        price: Number(product.price),
+        summary: product.summary.trim(),
+        description: product.description.trim(),
+        thumbnail: serverThumbnail || product.thumbnail.url, // 수정된 썸네일 또는 기존 썸네일
+        images:
+          serverimages.length > 0
+            ? serverimages
+            : product.images.map((data) => data.url), // 수정된 이미지 또는 기존 이미지
+        deposit: Number(product.deposit),
+        additionalFee: Number(product.additionalFee),
+        guideLine: product.guideLine.trim(),
+      };
+
+      mutate({ id, data: updateData }); // 객체 형태로 전달
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.thumbnail}>
@@ -123,7 +233,11 @@ export default function ProductEdit({ id }: { id: number | string }) {
           {product.thumbnail ? (
             <div className={styles.thumbnailImage}>
               <Image
-                src={product.thumbnail}
+                src={
+                  product.thumbnail.type === "server"
+                    ? `https://image.re-bin.kr/rebin/${product.thumbnail.url}` // 서버 썸네일
+                    : URL.createObjectURL(product.thumbnail.url) // 로컬 썸네일
+                }
                 alt="Thumbnail"
                 width={100}
                 height={100}
@@ -151,7 +265,9 @@ export default function ProductEdit({ id }: { id: number | string }) {
           >
             업로드
           </label>
-          <label className={styles.uploadLabel}>사진 저장하기</label>
+          <label className={styles.uploadLabel} onClick={handleSaveThumbnail}>
+            사진 저장하기
+          </label>
         </div>
       </div>
       <div className={styles.divider}></div>
@@ -260,7 +376,11 @@ export default function ProductEdit({ id }: { id: number | string }) {
                 width={100}
                 height={100}
                 layout="responsive"
-                src={image}
+                src={
+                  image.type === "server"
+                    ? `https://image.re-bin.kr/rebin/${image.url}` // 서버 이미지
+                    : URL.createObjectURL(image.url) // 로컬 이미지
+                }
                 alt={`Gallery ${index}`}
               />
 
@@ -287,11 +407,19 @@ export default function ProductEdit({ id }: { id: number | string }) {
           >
             업로드
           </label>
-          <label className={styles.uploadLabel}>사진 저장하기</label>
+          <label className={styles.uploadLabel} onClick={handleSaveGallery}>
+            사진 저장하기
+          </label>
         </div>
       </div>
       <div className={styles.divider}></div>
-      <button className={styles.saveButton}>저장하기</button>
+      <button
+        className={`${styles.saveButton} ${isSaveDisabled && styles.notBtn}`}
+        disabled={isSaveDisabled}
+        onClick={handleSaveBtn}
+      >
+        수정하기
+      </button>
     </div>
   );
 }
@@ -299,4 +427,43 @@ export default function ProductEdit({ id }: { id: number | string }) {
 async function getData(id: number | string): Promise<Product> {
   const { data } = await apiClient.get(`/admin/products/${id}`);
   return data;
+}
+
+async function postImage(images: File[]) {
+  console.log(images);
+  const formData = new FormData();
+
+  images.forEach((image) => {
+    if (image.type === "local") {
+      formData.append("images", image.url);
+    }
+  });
+
+  const response = await apiClient.post("/api/images", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return {
+    local: response.data,
+    server: images.filter((data) => data.type === "server"),
+  }; // 서버에서 반환된 데이터
+}
+
+async function editProduct(
+  id: number | string,
+  data: {
+    name: string;
+    price: number | string;
+    summary: string;
+    description: string;
+    thumbnail: string | null;
+    images: string[] | null;
+    deposit: number | string;
+    additionalFee: number | string;
+    guideLine: string;
+  }
+) {
+  return await apiClient.put(`/admin/products/${id}`, data); // POST 대신 PUT 사용 권장
 }

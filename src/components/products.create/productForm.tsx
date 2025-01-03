@@ -283,7 +283,7 @@ export default function ProductForm() {
                 className={styles.textarea}
               />
               <div className={styles.charCount}>
-                ({contentLength.guideLine}/2000)
+                ({contentLength.guideLine}/5000)
               </div>
             </td>
           </tr>
@@ -298,7 +298,7 @@ export default function ProductForm() {
                 className={styles.textarea}
               />
               <div className={styles.charCount}>
-                ({contentLength.description}/2000)
+                ({contentLength.description}/5000)
               </div>
             </td>
           </tr>
@@ -358,7 +358,8 @@ export default function ProductForm() {
   );
 }
 
-async function postImage(images: File[]) {
+export async function postImage(images: File[]) {
+  console.log(images);
   const formData = new FormData();
 
   images.forEach((image) => {

@@ -167,3 +167,8 @@
   display: flex;
   justify-content: center;
 }
+
+.notBtn {
+  background-color: var(--gray6);
+  cursor: not-allowed;
+}
