@@ -1,0 +1,12 @@
+.container {
+  padding: 1rem;
+}
+
+.container p:nth-child(1) {
+  font-size: 1.3rem;
+}
+
+.container button {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+}

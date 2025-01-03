@@ -1,0 +1,22 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.table th,
+.table td {
+  background-color: var(--gray);
+  font-size: 0.8rem; /* 크기를 조정 */
+  text-align: center;
+  padding: 0.5rem 0.2rem;
+}
+
+.table th {
+  border-bottom: 1.3px solid black;
+}
+
+.table td {
+  cursor: pointer;
+  border-bottom: 1px solid var(--gray4);
+}
