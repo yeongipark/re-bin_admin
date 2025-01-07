@@ -63,7 +63,7 @@ export default function CalendarBody({
                   displayNone={currentDate.month !== day.month}
                   onClick={() => {
                     selectedDate.selectDate(day.date);
-                    router.push(`/timeslot/${selectedDate.date}`);
+                    router.push(`/timeslot/${day.date}`);
                   }}
                   isSelected={selectedDate.date === day.date}
                 />

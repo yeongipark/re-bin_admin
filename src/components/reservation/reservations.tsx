@@ -14,7 +14,7 @@ type Reservation = {
   code: string;
   productName: string;
   name: string;
-  time: string;
+  shootDateTime: string;
   reserveTime: string;
   status: keyof typeof ReservationStatusType;
 };
@@ -184,7 +184,7 @@ export default function Reservations() {
                 </td>
                 <td>{item.productName}</td>
                 <td>{item.name}</td>
-                <td>{item.reserveTime}</td>
+                <td>{item.shootDateTime.split("T").join(" ").slice(0, -3)}</td>
                 <td>
                   <span>{ReservationStatusType[item.status]}</span>
                 </td>
