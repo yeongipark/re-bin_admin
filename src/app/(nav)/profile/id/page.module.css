@@ -1,0 +1,51 @@
+.title {
+  font-size: 1.3rem;
+  margin: 1rem 0;
+}
+
+.wrap {
+  position: relative;
+}
+
+.wrap > input {
+  width: 100%;
+  font-size: 1.2rem;
+  padding: 0.7rem;
+  padding-right: 2.5rem;
+  border-radius: 20px;
+  border: 1px solid black;
+}
+
+.wrap > input:focus {
+  outline: none;
+}
+
+.icon {
+  cursor: pointer;
+  position: absolute;
+  top: 0.8rem;
+  right: 10px;
+  font-size: 1.5rem;
+}
+
+.btn {
+  position: fixed;
+  bottom: 0;
+  max-width: 600px;
+  width: 100%;
+}
+
+.btn > button {
+  border-radius: 0px;
+  padding: 1rem;
+  width: 100%;
+}
+
+.active {
+  background-color: black;
+  color: white;
+}
+
+.active:active {
+  background-color: var(--gray6);
+}

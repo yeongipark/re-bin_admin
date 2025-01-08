@@ -1,0 +1,25 @@
+.container {
+  height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  border: 1px solid var(--gray6);
+  padding: 5rem;
+  border-radius: 10px;
+}
+
+.btnWrap button {
+  width: 13rem;
+  background-color: black;
+  color: white;
+}
+
+.btnWrap button:active {
+  background-color: var(--gray6);
+}
