@@ -1,3 +1,4 @@
+import Link from "next/link";
 import style from "./page.module.css";
 import TimeslotTable from "@/components/timeslot/timeslotTable";
 
@@ -8,7 +9,9 @@ export default function Page({ params }: { params: { date: string } }) {
       <p className={style.title}>
         {date} {getDayOfWeek(date)}
       </p>
-      <button>추가하기</button>
+      <button>
+        <Link href={`/timeslot/${params.date}/create`}>추가하기</Link>
+      </button>
       <TimeslotTable date={date} />
     </div>
   );
