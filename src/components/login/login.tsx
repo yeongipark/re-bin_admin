@@ -25,6 +25,7 @@ export default function Login() {
 
       // HTTP 상태 코드 확인
       if (res.status !== 201) {
+        alert("오류가 발생했습니다.");
         throw new Error(`Login failed with status ${res.statusText}`);
       }
 
@@ -40,6 +41,7 @@ export default function Login() {
         throw new Error("Access token is missing.");
       }
     } catch (error) {
+      alert("오류가 발생했습니다.");
       console.error("Unexpected Error:", error);
     }
   };

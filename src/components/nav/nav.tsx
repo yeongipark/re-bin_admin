@@ -59,12 +59,12 @@ export default function Nav() {
             { name: "소개 관리", link: "/introduction" },
             { name: "프로필 관리", link: "/profile" },
           ].map((item) => (
-            <li key={item.name} className={styles.menuItem}>
-              <Link href={item.link}>
+            <Link href={item.link} key={item.name}>
+              <li className={styles.menuItem}>
                 <span onClick={closeMenu}>{item.name}</span>
-              </Link>
-              <AiOutlineRight />
-            </li>
+                <AiOutlineRight />
+              </li>
+            </Link>
           ))}
         </ul>
       </div>

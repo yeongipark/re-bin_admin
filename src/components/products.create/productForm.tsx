@@ -111,7 +111,6 @@ export default function ProductForm() {
     try {
       if (product.thumbnail) {
         const thumbnailResponse = await postImage([product.thumbnail]);
-        console.log(thumbnailResponse.urls[0]);
         setServerThumbnail(thumbnailResponse.urls[0]);
         alert("썸네일 저장 완료!");
       } else {
