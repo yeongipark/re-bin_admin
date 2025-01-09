@@ -1,6 +1,7 @@
 import Link from "next/link";
 import style from "./page.module.css";
 import TimeslotTable from "@/components/timeslot/timeslotTable";
+import ProtectedPage from "@/components/protectedRouter";
 
 export default function Page({ params }: { params: { date: string } }) {
   const date = params.date;
@@ -12,7 +13,10 @@ export default function Page({ params }: { params: { date: string } }) {
       <button>
         <Link href={`/timeslot/${params.date}/create`}>추가하기</Link>
       </button>
-      <TimeslotTable date={date} />
+      <ProtectedPage>
+        {" "}
+        <TimeslotTable date={date} />
+      </ProtectedPage>
     </div>
   );
 }
