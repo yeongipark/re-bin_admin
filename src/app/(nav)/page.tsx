@@ -1,9 +1,12 @@
 import ReservationTotal from "@/components/home/reservationTotal";
+import ProtectedPage from "@/components/protectedRouter";
 
 export default function Home() {
   return (
     <div>
-      <ReservationTotal />
+      <ProtectedPage>
+        <ReservationTotal />
+      </ProtectedPage>
     </div>
   );
 }

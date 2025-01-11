@@ -7,6 +7,7 @@ import apiClient from "@/util/axios";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/loading/loading";
+import ProtectedPage from "@/components/protectedRouter";
 
 async function changeId(newId: string) {
   await apiClient.post("/admin/profile/id", { newId });
@@ -38,26 +39,28 @@ export default function Page() {
   if (isPending) return <Loading text="로딩중.." />;
 
   return (
-    <div>
-      <div style={{ padding: "0px 10px" }}>
-        <div className={style.wrap}>
-          <input
-            type="text"
-            value={id}
-            onChange={(e) => setId(e.target.value)}
-          />
-          <TiDeleteOutline className={style.icon} onClick={handleDeleteBtn} />
+<ProtectedPage>
+      <div>
+        <div style={{ padding: "0px 10px" }}>
+          <div className={style.wrap}>
+            <input
+              type="text"
+              value={id}
+              onChange={(e) => setId(e.target.value)}
+            />
+            <TiDeleteOutline className={style.icon} onClick={handleDeleteBtn} />
+          </div>
+        </div>
+        <div className={style.btn}>
+          <button
+            disabled={id.length < 5}
+            className={`${id.length >= 5 && style.active}`}
+            onClick={handleSaveBtn}
+          >
+            저장하기
+          </button>
         </div>
       </div>
-      <div className={style.btn}>
-        <button
-          disabled={id.length < 5}
-          className={`${id.length >= 5 && style.active}`}
-          onClick={handleSaveBtn}
-        >
-          저장하기
-        </button>
-      </div>
-    </div>
+</ProtectedPage>
   );
 }

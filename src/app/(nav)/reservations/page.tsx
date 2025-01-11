@@ -1,5 +1,6 @@
+import ProtectedPage from "@/components/protectedRouter";
 import Reservations from "@/components/reservation/reservations";
 
 export default function Page() {
-  return <Reservations />;
+  return <ProtectedPage><Reservations /></ProtectedPage>;
 }

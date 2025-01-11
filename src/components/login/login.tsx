@@ -53,7 +53,7 @@ export default function Login() {
     if (token) {
       router.replace("/");
     }
-  }, []);
+  }, [router]);
 
   return (
     <div className={style.wrap}>

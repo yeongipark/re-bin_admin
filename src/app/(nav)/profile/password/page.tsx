@@ -8,6 +8,7 @@ import apiClient from "@/util/axios";
 import Loading from "@/components/loading/loading";
 import { IoEyeSharp } from "react-icons/io5";
 import { BsEyeSlash } from "react-icons/bs";
+import ProtectedPage from "@/components/protectedRouter";
 
 export default function Page() {
   const [password, setPassword] = useState("");
@@ -30,63 +31,65 @@ export default function Page() {
   if (isPending) return <Loading text="변경중.." />;
 
   return (
-    <div>
-      <div style={{ padding: "0px 10px" }}>
-        <div className={style.wrap}>
-          <p>기존 비밀번호</p>
-
-          <input
-            type={showPassword ? "text" : "password"} // 비밀번호 보기 상태에 따라 type 변경
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="기존 비밀번호"
-          />
-          {showPassword ? (
-            <BsEyeSlash
-              className={style.icon}
-              onClick={() => setShowPassword(false)} // 감추기
+  <ProtectedPage>
+      <div>
+        <div style={{ padding: "0px 10px" }}>
+          <div className={style.wrap}>
+            <p>기존 비밀번호</p>
+  
+            <input
+              type={showPassword ? "text" : "password"} // 비밀번호 보기 상태에 따라 type 변경
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="기존 비밀번호"
             />
-          ) : (
-            <IoEyeSharp
-              className={style.icon}
-              onClick={() => setShowPassword(true)} // 보기
+            {showPassword ? (
+              <BsEyeSlash
+                className={style.icon}
+                onClick={() => setShowPassword(false)} // 감추기
+              />
+            ) : (
+              <IoEyeSharp
+                className={style.icon}
+                onClick={() => setShowPassword(true)} // 보기
+              />
+            )}
+          </div>
+          <div className={style.wrap} style={{ marginTop: "2rem" }}>
+            <p>변경 할 비밀번호</p>
+  
+            <input
+              type={showChangePassword ? "text" : "password"} // 변경 비밀번호 보기 상태에 따라 type 변경
+              value={changePassword}
+              onChange={(e) => setChangePassword(e.target.value)}
+              placeholder="변경할 비밀번호"
             />
-          )}
+            {showChangePassword ? (
+              <BsEyeSlash
+                className={style.icon}
+                onClick={() => setShowChangePassword(false)} // 감추기
+              />
+            ) : (
+              <IoEyeSharp
+                className={style.icon}
+                onClick={() => setShowChangePassword(true)} // 보기
+              />
+            )}
+          </div>
         </div>
-        <div className={style.wrap} style={{ marginTop: "2rem" }}>
-          <p>변경 할 비밀번호</p>
-
-          <input
-            type={showChangePassword ? "text" : "password"} // 변경 비밀번호 보기 상태에 따라 type 변경
-            value={changePassword}
-            onChange={(e) => setChangePassword(e.target.value)}
-            placeholder="변경할 비밀번호"
-          />
-          {showChangePassword ? (
-            <BsEyeSlash
-              className={style.icon}
-              onClick={() => setShowChangePassword(false)} // 감추기
-            />
-          ) : (
-            <IoEyeSharp
-              className={style.icon}
-              onClick={() => setShowChangePassword(true)} // 보기
-            />
-          )}
+        <div className={style.btn}>
+          <button
+            disabled={password.length < 5 || changePassword.length < 5}
+            className={`${
+              password.length >= 5 && changePassword.length >= 5 && style.active
+            }`}
+            onClick={() => mutate()}
+          >
+            저장하기
+          </button>
         </div>
       </div>
-      <div className={style.btn}>
-        <button
-          disabled={password.length < 5 || changePassword.length < 5}
-          className={`${
-            password.length >= 5 && changePassword.length >= 5 && style.active
-          }`}
-          onClick={() => mutate()}
-        >
-          저장하기
-        </button>
-      </div>
-    </div>
+  </ProtectedPage>
   );
 }
 

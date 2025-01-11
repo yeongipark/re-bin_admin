@@ -1,6 +1,7 @@
 import Link from "next/link";
 import style from "./page.module.css";
 import Notice from "@/components/notice/notice";
+import ProtectedPage from "@/components/protectedRouter";
 
 export default function Page() {
   return (
@@ -11,7 +12,7 @@ export default function Page() {
           <Link href={"/notice/write"}>추가하기</Link>
         </button>
       </div>
-      <Notice />
+      <ProtectedPage><Notice /></ProtectedPage>
     </div>
   );
 }
