@@ -85,10 +85,15 @@ export default function Products() {
                 {post.totalReservationCount}
               </td>
               <td onClick={() => router.push(`/products/edit/${post.id}`)}>
-                <button>수정하기</button>
+                <button style={{ fontSize: "0.8rem" }}>수정하기</button>
               </td>
               <td>
-                <button onClick={() => handleDelete(post.id)}>삭제하기</button>
+                <button
+                  onClick={() => handleDelete(post.id)}
+                  style={{ fontSize: "0.8rem" }}
+                >
+                  삭제하기
+                </button>
               </td>
             </tr>
           ))}

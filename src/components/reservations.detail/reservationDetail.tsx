@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { ReservationStatusType } from "../types";
-import styles from "./ReservationDetail.module.css";
+import styles from "./reservationDetail.module.css";
 import apiClient from "@/util/axios";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "../loading/loading";

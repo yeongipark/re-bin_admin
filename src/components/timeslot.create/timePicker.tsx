@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import styles from "./TimePicker.module.css"; // CSS Module import
+import styles from "./timePicker.module.css"; // CSS Module import
 import apiClient from "@/util/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";

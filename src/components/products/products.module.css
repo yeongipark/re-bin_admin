@@ -4,6 +4,11 @@
   margin-top: 1rem;
 }
 
+.table button {
+  font-size: 0.8rem;
+  color: black;
+}
+
 .table th,
 .table td {
   background-color: var(--gray);

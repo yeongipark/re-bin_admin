@@ -86,3 +86,8 @@
   cursor: pointer;
   text-decoration: underline;
 }
+
+.table button {
+  font-size: 0.8rem;
+  color: black;
+}
