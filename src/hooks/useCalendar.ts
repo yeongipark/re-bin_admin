@@ -58,9 +58,9 @@ export const useCalendar = ({ basicDate }: { basicDate?: string } = {}) => {
 
   const handlePrevMonth = () => {
     // 현재 달보다 이전으로 가지 못하게 설정
-    if (currentDate.getMonth() === new Date().getMonth()) {
-      return;
-    }
+    // if (currentDate.getMonth() === new Date().getMonth()) {
+    //   return;
+    // }
     setCurrentDate((prevDate) => subMonths(prevDate, 1));
   };
 

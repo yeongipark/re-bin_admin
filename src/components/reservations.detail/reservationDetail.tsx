@@ -86,7 +86,7 @@ export default function ReservationDetail() {
           </tr>
           <tr>
             <th>신청 일시</th>
-            <td>{data?.createdAt}</td>
+            <td>{formatDateTime(data!.createdAt)}</td>
           </tr>
           <tr>
             <th>상태</th>

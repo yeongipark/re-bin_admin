@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Loading from "../loading/loading";
 import { useState } from "react";
 import Confirm from "../confirm";
+import Link from "next/link";
 
 interface TimeSlot {
   id: number;
@@ -59,7 +60,13 @@ export default function TimeslotTable({ date }: { date: string }) {
             <tr key={item.id}>
               <td className={styles.id}>{item.time.slice(0, -3)}</td>
               <td>{item.isAvailable ? "O" : "X"}</td>
-              <td>{item.reservationCode}</td>
+              <td>
+                {item.reservationCode && (
+                  <Link href={`/detail?code=${item.reservationCode}`}>
+                    {item.reservationCode}
+                  </Link>
+                )}
+              </td>
               <td>
                 {item.isAvailable && (
                   <button

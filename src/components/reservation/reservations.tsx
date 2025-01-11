@@ -8,6 +8,8 @@ import { ReservationStatusType } from "../types";
 import apiClient from "@/util/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import Alert from "../alert/alert";
+import Loading from "../loading/loading";
 
 type Reservation = {
   id: number | string;
@@ -47,7 +49,7 @@ export default function Reservations() {
     setStartDate(firstDayOfMonth);
   }, []);
 
-  const { data, isLoading } = useQuery<Reservation[]>({
+  const { data, isLoading, error } = useQuery<Reservation[]>({
     queryKey: ["reservations", startDate, endDate],
     queryFn: () => getData(startDate, endDate),
     enabled: !!startDate && !!endDate,
@@ -119,6 +121,16 @@ export default function Reservations() {
     setConfirmOpen(true); // Confirm 컴포넌트를 열기
   };
 
+  if (error) {
+    <Alert
+      title="오류가 발생했습니다. 다시 시도해 주세요."
+      type="cancel"
+      setModalState={() => router.back()}
+    />;
+  }
+
+  if (isLoading) return <Loading text="로딩중.." />;
+
   return (
     <div className={styles.container}>
       <p className={styles.title}>예약 현황</p>
@@ -157,8 +169,8 @@ export default function Reservations() {
         <IoIosSearch className={styles.searchButton} onClick={() => {}} />
       </div>
 
-      {isLoading ? (
-        <p>로딩 중...</p>
+      {filteredData.length === 0 ? (
+        <p>예약 정보가 없습니다.</p>
       ) : (
         <table className={styles.table}>
           <thead>

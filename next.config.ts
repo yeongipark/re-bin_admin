@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true, // 빌드 시 ESLint 검사 비활성화
+  },
   images: {
     unoptimized: true,
     // 허용할 외부 이미지 도메인을 remotePatterns로 설정

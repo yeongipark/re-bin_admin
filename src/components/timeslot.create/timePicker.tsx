@@ -36,7 +36,8 @@ export default function TimePicker({ date }: { date: string }) {
   }, [hour]);
 
   const { mutate } = useMutation({
-    mutationFn: () => createTimeSlot(`${hour}:${minute}`, date),
+    mutationFn: () =>
+      createTimeSlot(`${hour}:${minute.toString().padStart(2, "0")}`, date),
     onMutate: async () => {
       const previousData = queryClient.getQueryData(["timeslot", date]);
 

@@ -78,7 +78,7 @@ export default function ProductEdit({ id }: { id: number | string }) {
     }
   }, [data]);
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: ({ id, data }: { id: number | string; data: any }) =>
       editProduct(id, data), // 객체 구조 분해
     onMutate: () => {
@@ -225,6 +225,8 @@ export default function ProductEdit({ id }: { id: number | string }) {
       mutate({ id, data: updateData }); // 객체 형태로 전달
     }
   };
+
+  if (isPending) return <Loading text="로딩중.." />;
 
   return (
     <div className={styles.container}>

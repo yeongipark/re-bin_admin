@@ -1,10 +1,12 @@
 "use client";
 
-import style from "./calendarBody.module.css";
+import style from "./homeCalendarBody.module.css";
 import { CalendarBodyProps } from "../types";
-import { useRouter } from "next/navigation";
+import apiClient from "@/util/axios";
+import { useQuery } from "@tanstack/react-query";
+import Loading from "../loading/loading";
 
-export default function CalendarBody({
+export default function HomeCalendarBody({
   before,
   today,
   currentDate,
@@ -12,18 +14,17 @@ export default function CalendarBody({
   dispatch,
   selectedDate,
 }: CalendarBodyProps) {
-  // const {
-  //   daysInMonth,
-  //   today,
-  //   before,
-  //   currentDate,
-  //   dispatch,
-  //   selectedDate,
-  //   isOverMax,
-  // } = useCalendar({  });
+  const { data, isLoading } = useQuery({
+    queryKey: ["reservations_month"],
+    queryFn: getRervertaionCount,
+  });
 
-  const router = useRouter();
   const weeks = ["일", "월", "화", "수", "목", "금", "토"];
+
+  console.log(data);
+
+  if (isLoading) return <Loading text="로딩중.." />;
+
   return (
     <div>
       <div className={style.navContainer}>
@@ -62,7 +63,6 @@ export default function CalendarBody({
                   displayNone={currentDate.month !== day.month}
                   onClick={() => {
                     selectedDate.selectDate(day.date);
-                    router.push(`/timeslot/${day.date}`);
                   }}
                   isSelected={selectedDate.date === day.date}
                 />
@@ -86,7 +86,6 @@ function Day({
   day,
   isWeekend,
   today,
-  before,
   displayNone,
   onClick,
   isSelected,
@@ -102,11 +101,14 @@ function Day({
   return (
     <div
       className={`${style.day} ${isWeekend && style.weekend} ${
-        !today && before && style.disabled
-      } ${displayNone && style.none} ${isSelected && style.selected}`}
+        displayNone && style.none
+      } ${isSelected && style.selected}`}
       onClick={onClick}
     >
       {day}
+      <div className={style.reservationText}>
+        <p>예약 건수 : 10</p>
+      </div>
       {today && (
         <div className={style.todayWrap}>
           <div className={style.today}></div>
@@ -114,4 +116,13 @@ function Day({
       )}
     </div>
   );
+}
+
+interface Type {
+  count: number;
+}
+
+async function getRervertaionCount(): Promise<Type> {
+  const { data } = await apiClient.get("/admin/reservations/month");
+  return data;
 }

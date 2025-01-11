@@ -2,8 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { GoArrowLeft } from "react-icons/go";
-import styles from "./BackNav.module.css";
-
+import styles from "./backNav.module.css";
 export default function BackNav({ text }: { text: string }) {
   const router = useRouter();
 
