@@ -21,8 +21,6 @@ export default function HomeCalendarBody({
 
   const weeks = ["일", "월", "화", "수", "목", "금", "토"];
 
-  console.log(data);
-
   if (isLoading) return <Loading text="로딩중.." />;
 
   return (
@@ -65,6 +63,10 @@ export default function HomeCalendarBody({
                     selectedDate.selectDate(day.date);
                   }}
                   isSelected={selectedDate.date === day.date}
+                  count={data?.find((item) => item.date === day.date)?.count}
+                  reservations={
+                    data?.find((item) => item.date === day.date)?.reservation
+                  }
                 />
               );
             })}
@@ -89,6 +91,8 @@ function Day({
   displayNone,
   onClick,
   isSelected,
+  count,
+  reservations,
 }: {
   day: string;
   isWeekend: boolean;
@@ -97,7 +101,10 @@ function Day({
   displayNone: boolean;
   onClick: () => void;
   isSelected: boolean;
+  count: number | undefined;
+  reservations: Revervations[] | undefined;
 }) {
+  console.log(reservations);
   return (
     <div
       className={`${style.day} ${isWeekend && style.weekend} ${
@@ -106,23 +113,35 @@ function Day({
       onClick={onClick}
     >
       {day}
-      <div className={style.reservationText}>
-        <p>예약 건수 : 10</p>
-      </div>
-      {today && (
-        <div className={style.todayWrap}>
-          <div className={style.today}></div>
+      {count && (
+        <div className={style.reservationText}>
+          <p>예약 건수 : {count}</p>
         </div>
       )}
+      {reservations &&
+        reservations.length > 0 &&
+        reservations.map((item, index) => (
+          <div key={index} className={style.reservationText}>
+            <p>{item.time.slice(0, -3)}</p>
+            <p>{item.productName}</p>
+          </div>
+        ))}
     </div>
   );
 }
 
-interface Type {
-  count: number;
+interface Revervations {
+  time: string;
+  productName: string;
 }
 
-async function getRervertaionCount(): Promise<Type> {
+interface Type {
+  count: number;
+  date: string;
+  reservation: Revervations[];
+}
+
+async function getRervertaionCount(): Promise<Type[]> {
   const { data } = await apiClient.get("/admin/reservations/month");
   return data;
 }

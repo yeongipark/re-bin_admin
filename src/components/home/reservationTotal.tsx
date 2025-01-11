@@ -53,6 +53,6 @@ export default function ReservationTotal() {
 }
 
 async function getTotalReservation() {
-  const res = await apiClient.get("admin/reservations/month");
+  const res = await apiClient.get("admin/reservations/month/count");
   return res.data;
 }
