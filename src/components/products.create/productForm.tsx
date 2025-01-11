@@ -358,7 +358,6 @@ export default function ProductForm() {
 }
 
 export async function postImage(images: File[]) {
-  console.log(images);
   const formData = new FormData();
 
   images.forEach((image) => {
