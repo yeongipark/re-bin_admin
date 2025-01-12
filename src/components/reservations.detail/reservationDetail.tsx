@@ -89,20 +89,32 @@ export default function ReservationDetail() {
             <td>{formatDateTime(data!.createdAt)}</td>
           </tr>
           <tr>
+            <th>촬영일</th>
+            <td>{data?.shootDate ?? "날짜 없음"}</td>
+          </tr>
+          <tr>
             <th>상태</th>
             <td>{ReservationStatusType[data!.status]}</td>
           </tr>
-          <tr>
-            <th>입금자명</th>
-            <td>{data?.payerName}</td>
-          </tr>
-          <tr>
-            <th>입금 일자</th>
-            <td>{formatDateTime(data!.paymentDate)}</td>
-          </tr>
+          {data?.payerName && (
+            <>
+              <tr>
+                <th>입금자명</th>
+                <td>{data?.payerName ?? "입금 버"}</td>
+              </tr>
+              <tr>
+                <th>입금 일자</th>
+                <td>{formatDateTime(data!.paymentDate)}</td>
+              </tr>
+            </>
+          )}
           <tr>
             <th>인스타 업로드</th>
             <td>{data?.isAgreeUpload ? "허용" : "불가"}</td>
+          </tr>
+          <tr>
+            <th>총금액</th>
+            <td>{data?.totalPrice.toLocaleString()}원</td>
           </tr>
           <tr>
             <th>요청 사항</th>
