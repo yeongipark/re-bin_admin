@@ -5,6 +5,7 @@ import { CalendarBodyProps } from "../types";
 import apiClient from "@/util/axios";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "../loading/loading";
+import Link from "next/link";
 
 export default function HomeCalendarBody({
   before,
@@ -62,6 +63,7 @@ export default function HomeCalendarBody({
                   onClick={() => {
                     selectedDate.selectDate(day.date);
                   }}
+                  date={day.date}
                   isSelected={selectedDate.date === day.date}
                   count={data?.find((item) => item.date === day.date)?.count}
                   reservations={
@@ -87,13 +89,14 @@ function Week({ text, isWeekend }: { text: string; isWeekend: boolean }) {
 function Day({
   day,
   isWeekend,
-  today,
   displayNone,
   onClick,
   isSelected,
   count,
   reservations,
+  date,
 }: {
+  date: string;
   day: string;
   isWeekend: boolean;
   today: boolean;
@@ -106,27 +109,29 @@ function Day({
 }) {
   console.log(reservations);
   return (
-    <div
-      className={`${style.day} ${isWeekend && style.weekend} ${
-        displayNone && style.none
-      } ${isSelected && style.selected}`}
-      onClick={onClick}
-    >
-      {day}
-      {count && (
-        <div className={style.reservationText}>
-          <p>예약 건수 : {count}</p>
-        </div>
-      )}
-      {reservations &&
-        reservations.length > 0 &&
-        reservations.map((item, index) => (
-          <div key={index} className={style.reservationText}>
-            <p>{item.time.slice(0, -3)}</p>
-            <p>{item.productName}</p>
+    <Link href={`/reservations?date=${date}`}>
+      <div
+        className={`${style.day} ${isWeekend && style.weekend} ${
+          displayNone && style.none
+        } ${isSelected && style.selected}`}
+        onClick={onClick}
+      >
+        {day}
+        {count && (
+          <div className={style.reservationText}>
+            <p>예약 건수 : {count}</p>
           </div>
-        ))}
-    </div>
+        )}
+        {reservations &&
+          reservations.length > 0 &&
+          reservations.map((item, index) => (
+            <div key={index} className={style.reservationText}>
+              <p>{item.time.slice(0, -3)}</p>
+              <p>{item.productName}</p>
+            </div>
+          ))}
+      </div>
+    </Link>
   );
 }
 

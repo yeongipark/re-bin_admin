@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Alert from "../alert/alert";
 import Loading from "../loading/loading";
+import { useSearchParams } from "next/navigation";
 
 type Reservation = {
   id: number | string;
@@ -23,6 +24,9 @@ type Reservation = {
 
 export default function Reservations() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const date = searchParams.get("date");
 
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -37,17 +41,22 @@ export default function Reservations() {
 
   // 초기 날짜 설정
   useEffect(() => {
-    const today = new Date();
-    const formattedEndDate = today.toISOString().split("T")[0];
-    const firstDayOfMonth = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      1
-    ).toLocaleDateString("en-CA");
+    if (date) {
+      setEndDate(date);
+      setStartDate(date);
+    } else {
+      const today = new Date();
+      const formattedEndDate = today.toISOString().split("T")[0];
+      const firstDayOfMonth = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        1
+      ).toLocaleDateString("en-CA");
 
-    setEndDate(formattedEndDate);
-    setStartDate(firstDayOfMonth);
-  }, []);
+      setEndDate(formattedEndDate);
+      setStartDate(firstDayOfMonth);
+    }
+  }, [date]);
 
   const { data, isLoading, error } = useQuery<Reservation[]>({
     queryKey: ["reservations", startDate, endDate],
