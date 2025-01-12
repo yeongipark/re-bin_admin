@@ -6,10 +6,13 @@ import Image from "next/image";
 import apiClient from "@/util/axios";
 import { useRouter } from "next/navigation";
 import { getToken, setToken } from "@/util/cookie";
+import Loading from "../loading/loading";
 
 export default function Login() {
   const [idFocused, setIdFocused] = useState(false);
   const [pwFocused, setPwFocused] = useState(false);
+
+  const [isLoding, setIsLoading] = useState(false);
 
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +25,7 @@ export default function Login() {
         loginId,
         password,
       });
+      setIsLoading(true);
 
       // HTTP 상태 코드 확인
       if (res.status !== 201) {
@@ -34,6 +38,7 @@ export default function Login() {
       if (accessToken) {
         localStorage.setItem("accessToken", accessToken); // 로컬 스토리지에 저장
         setToken(accessToken); // 쿠키에 저장
+        setIsLoading(false);
 
         // 성공적으로 로그인 후 홈 화면으로 리다이렉트
         router.push("/");
@@ -54,6 +59,8 @@ export default function Login() {
       router.replace("/");
     }
   }, [router]);
+
+  if (isLoding) <Loading text="로딩중.."></Loading>;
 
   return (
     <div className={style.wrap}>
