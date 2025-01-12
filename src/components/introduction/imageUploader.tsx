@@ -41,7 +41,7 @@ export default function ImageUploader() {
           <div className={styles.imageUpload}>
             {images[index] ? (
               <Image
-                src={`https://image.re-bin.kr/${images[index] as string}`}
+                src={`https://image.re-bin.kr/rebin/${images[index] as string}`}
                 alt={`미리보기 ${index + 1}`}
                 className={styles.image}
                 width={100}

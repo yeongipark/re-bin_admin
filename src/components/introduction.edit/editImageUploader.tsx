@@ -141,7 +141,7 @@ export default function EditImageUploader() {
                 <Image
                   src={
                     images[index].type === "server"
-                      ? `https://image.re-bin.kr/${images[index].url}`
+                      ? `https://image.re-bin.kr/rebin/${images[index].url}`
                       : (images[index].url as string)
                   }
                   alt={`Preview ${index + 1}`}
