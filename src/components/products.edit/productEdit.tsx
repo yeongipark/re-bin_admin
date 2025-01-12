@@ -106,16 +106,16 @@ export default function ProductEdit({ id }: { id: number | string }) {
   // 저장 버튼 활성화 조건 업데이트
   useEffect(() => {
     const isAllFieldsFilled =
-      product.name.trim() && // 상품명
+      product.name && // 상품명
       product.price &&
       !isNaN(Number(product.price)) && // 가격
-      product.summary.trim() && // 한줄 소개
-      product.description.trim() && // 상품 설명
+      product.summary && // 한줄 소개
+      product.description && // 상품 설명
       product.deposit &&
       !isNaN(Number(product.deposit)) && // 예약금
       product.additionalFee &&
       !isNaN(Number(product.additionalFee)) && // 추가 금액
-      product.guideLine.trim() && // 가이드라인
+      product.guideLine && // 가이드라인
       (serverThumbnail || product.thumbnail) &&
       (serverimages.length !== 0 || product.images.length !== 0);
 
@@ -342,7 +342,7 @@ export default function ProductEdit({ id }: { id: number | string }) {
               <textarea
                 name="guideLine"
                 maxLength={2000}
-                value={product.guideLine}
+                value={product.guideLine ?? ""}
                 onChange={handleInputChange}
                 className={styles.textarea}
               />
